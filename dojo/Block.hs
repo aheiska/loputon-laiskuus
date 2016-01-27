@@ -38,7 +38,8 @@ blockDx b d1 d2 = makeBlock (dx (p1 b) d1) (dx (p2 b) d2)
 -- TODO 3:
 -- Returns `true` if the block is standing.
 standing :: Block -> Bool
-standing B {p1 = pa, p2 = pb} = pa == pb
+-- standing B {p1 = pa, p2 = pb} = pa == pb
+standing (B pa pb) = pa == pb
 
 horizontal :: Block -> Bool
 horizontal block = (x $ p1 block) == (x $ p2 block)
