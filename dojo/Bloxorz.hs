@@ -10,8 +10,10 @@ type State = (Block, [Move])
 
 -- TODO 8:
 -- Returns `true` if the block `b` is at the final position
-done :: Block -> Level -> Bool
-done b level = undefined
+done :: Level -> Block ->  Bool
+done level block =
+  standing block &&
+  p1 block == goal level
 
 -- TODO 9:
 -- This function takes three arguments: the current block `b`,
@@ -22,21 +24,25 @@ done b level = undefined
 -- that was executed, i.e. the last move that was performed for
 -- the block to end up at position `b`.
 --
--- The function returns a stream of pairs: the first element of
+-- The function returns a list of pairs: the first element of
 -- the each pair is a neighboring block, and the second element
 -- is the augmented history of moves required to reach this block.
 --
 -- It should only return valid neighbors, i.e. block positions
 -- that are inside the terrain.
-neighboursWithHistory :: Block -> Level -> [Move] -> [State]
-neighboursWithHistory b level history = undefined
+neighboursWithHistory :: Level -> Block -> [Move] -> [State]
+neighboursWithHistory level block history =
+  map (\(b, m) -> (b, m : history)) legal
+  where
+    legal = legalNeighbours block (terr level)
 
 -- TODO 10:
 -- This function returns the list of neighbors without the block
 -- positions that have already been explored. We will use it to
 -- make sure that we don't explore circular paths.
 newNeighbours :: [State] -> Explored -> [State]
-newNeighbours neighbours explored = undefined
+newNeighbours neighbours explored =
+  filter (\(b, _) -> b `notMember` explored) neighbours
 
 -- TODO 11:
 -- The function `from` returns the infinite list of all possible paths
@@ -61,18 +67,27 @@ newNeighbours neighbours explored = undefined
 -- of different paths - the implementation should naturally
 -- construct the correctly sorted list.
 from :: Level -> [State] -> Explored -> [State]
-from level initial explored = undefined
+from level []                         _        = []
+from level (state @ (b, ms) : states) explored =
+  state : from level newStates newExplored
+  where
+    newStates = states ++ newNeighbours (neighboursWithHistory level b ms) explored
+    newBlocks = fromList (map fst newStates)
+    newExplored = explored `union` newBlocks
 
 -- TODO 12:
 -- The (possibly) infinite list of all paths that begin at the starting block.
 pathsFromStart :: Level -> [State]
-pathsFromStart level = undefined
+pathsFromStart level @ Level { start = startPos } =
+  from level [(startBlock, [])] (singleton startBlock)
+  where
+    startBlock = makeBlock startPos startPos
 
 -- TODO 13:
 -- Returns a list of all possible pairs of the goal block along
 -- with the history how it was reached.
 pathsToGoal :: Level -> [State]
-pathsToGoal l = undefined
+pathsToGoal level = filter (\(b, _) -> done level b) (pathsFromStart level)
 
 -- TODO 14:
 -- The (or one of the) shortest sequence(s) of moves to reach the
@@ -82,4 +97,6 @@ pathsToGoal l = undefined
 -- the first move that the player should perform from the starting
 -- position.
 solution :: Level -> [Move]
-solution level = undefined
+solution level = if null result then [] else reverse $ head result
+  where
+    result = map snd (pathsToGoal level)

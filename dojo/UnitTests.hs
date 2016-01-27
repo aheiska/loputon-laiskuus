@@ -50,7 +50,7 @@ test6 =
   TestCase (assertEqual
     "Neighbor history matches"
     [(makeBlock (Pos 1 2) (Pos 1 3), [Right,Left,Up]), (makeBlock (Pos 2 1) (Pos 3 1), [Down,Left,Up])]
-    (neighboursWithHistory (makeBlock (Pos 1 1) (Pos 1 1)) level [Left, Up])
+    (neighboursWithHistory level (makeBlock (Pos 1 1) (Pos 1 1)) [Left, Up])
   )
   where level = buildLevel level1
 

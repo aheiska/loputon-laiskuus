@@ -3,7 +3,7 @@ module Terrain where
 import Data.Char
 import Data.Maybe
 import Data.Vector (Vector, fromList, (!), length, elemIndex, findIndex, elem)
-import Prelude hiding (length) -- we need Vectors length, not Lists
+import Prelude hiding (length, elem) -- we need Vectors length, not Lists
 
 
 -- The data type `Pos` encodes positions in the terrain.
@@ -74,7 +74,11 @@ toLevel t = Level { start = findChar 'S' t
 -- `Vector` type or use the following definitions that get rid of the
 -- Maybe wrapper (not really relevant in this task).
 findChar :: Char -> LevelVector -> Pos
-findChar c levelVector = undefined
+findChar c levelVector =
+  Pos x y
+  where
+    x = findIndex' (\vc -> c `elem` vc) levelVector
+    y = elemIndex' c (levelVector ! x)
 
 findIndex' :: (Vector Char -> Bool) -> LevelVector -> Int
 findIndex' f vector = fromJust $ findIndex f vector
@@ -99,4 +103,11 @@ elemIndex' e vector = fromJust $ elemIndex e vector
 -- a valid position (not a '-' character) inside the terrain described
 -- by `LevelVector`.
 terrain :: LevelVector -> Terrain
-terrain levelVector pos = undefined
+terrain levelVector Pos { x = lx, y = ly } =
+  inRange && (levelVector ! lx ! ly) /= '-'
+  where
+    inRange =
+      lx >= 0 &&
+      ly >= 0 &&
+      lx < length levelVector &&
+      ly < length (levelVector ! lx)

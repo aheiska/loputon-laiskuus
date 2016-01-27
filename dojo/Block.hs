@@ -38,21 +38,23 @@ blockDx b d1 d2 = makeBlock (dx (p1 b) d1) (dx (p2 b) d2)
 -- TODO 3:
 -- Returns `true` if the block is standing.
 standing :: Block -> Bool
-standing block = undefined
+standing B {p1 = pa, p2 = pb} = pa == pb
 
 horizontal :: Block -> Bool
 horizontal block = (x $ p1 block) == (x $ p2 block)
 
 -- TODO 4:
 -- Returns `true` if the block is entirely inside the terrain.
-isLegal :: Block -> Terrain -> Bool
-isLegal block terrain = undefined
+isLegal :: Terrain -> Block ->  Bool
+isLegal terrain block = terrain (p1 block) && terrain (p2 block)
 
 -- TODO 5:
 -- This function returns the block at the start position of
 -- the game.
 startBlock :: Level -> Block
-startBlock level = undefined
+startBlock level = makeBlock s s
+  where
+    s = start level
 
 -- Functions left, right, up and down encode block moves
 -- in Bloxorz game.
@@ -85,10 +87,12 @@ down block
 -- Returns the list of blocks that can be obtained by moving
 -- the current block, together with the corresponding move.
 neighbours :: Block -> [(Block, Move)]
-neighbours block = undefined
+neighbours block = [(left block, Left), (right block, Right),
+  (up block, Up), (down block, Down)]
 
 -- TODO 7:
 -- Returns the list of positions reachable from the current block
 -- which are inside the terrain.
 legalNeighbours :: Block -> Terrain -> [(Block, Move)]
-legalNeighbours block terrain = undefined
+-- legalNeighbours block terrain = filter ((isLegal terrain).fst) (neighbours block)
+legalNeighbours block terrain = filter (\(b, _) -> isLegal terrain b) (neighbours block)
