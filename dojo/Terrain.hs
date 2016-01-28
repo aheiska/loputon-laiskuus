@@ -101,7 +101,7 @@ elemIndex' e vector = fromJust $ elemIndex e vector
 --
 --   Vector(Vector('S', 'T'), Vector('o', 'o'), Vector('o', 'o'))
 --
--- The resulting function should return `true` if the position `pos` is
+-- The resulting function should return `True` if the position `pos` is
 -- a valid position (not a '-' character) inside the terrain described
 -- by `LevelVector`.
 terrain :: LevelVector -> Terrain

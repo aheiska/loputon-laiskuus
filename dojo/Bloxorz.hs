@@ -9,7 +9,7 @@ type Explored = Set Block
 type State = (Block, [Move])
 
 -- TODO 8:
--- Returns `true` if the block `b` is at the final position
+-- Returns `True` if the block `b` is at the final position
 done :: Level -> Block ->  Bool
 done level block =
   standing block &&

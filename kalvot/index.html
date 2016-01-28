@@ -48,9 +48,8 @@
 					<h2>Sisältö</h2>
 					<ul>
 						<li>Esittely</li>
-						<li>Johdanto</li>
 						<li>Teoria</li>
-						<li>Bloxorz</li>
+						<li>Tehtävä</li>
 					</ul>
 				</section>
 
@@ -83,9 +82,10 @@
 						evaluoida kuin kerran.
 					</p>
 					<p>
-						Vastakkainen evaluointistragegia olisi ... (eager). Suurin osa
+						Vastakkainen evaluointistragegia olisi innokas* (eager). Suurin osa
 						ohjelmointikielistä käyttää tätä strategiaa.
 					</p>
+					<footer><small>*) oma suomennos, Wikipedia käyttää termiä datapohjainen</small></footer>
 					<!--
 					  Ei nyt mennä tässä: Strict / non-string semantiikka voidaan toteuttaa
 						vastaavasti eager / lazy evaluoinnilla.
@@ -120,7 +120,7 @@ let fibs = 0 : 1 : zipWith (+) fibs (tail fibs) -- [0,1,1,2,3,5,8,...]
 				<section>
 					<h2>Äärettömät listat äärellisessä muistissa</h2>
 					<p>
-						Yksi käyttökohde on pelien tekoälyssä. Esimerkiksi
+						Äärettömien listojen yksi käyttökohde on pelien tekoälyssä. Esimerkiksi
 						shakissa voisi generoida ääretöntä listaa mahdollisia siirtoja.
 					</p>
 					<p>
@@ -128,28 +128,12 @@ let fibs = 0 : 1 : zipWith (+) fibs (tail fibs) -- [0,1,1,2,3,5,8,...]
 						mutta niiden käsittely on helpompaa, kun tarvittava koko päätetään
 						vasta tietorakennetta käytettäessä.
 					</p>
-					<p>
-						Äärettömät listat ovat myös hyvä keino helposti käyttää kaikki tietokoneen muisti...
-					</p>
 				</section>
 
 				<section>
-					<h2>Haskell, syntaksista</h2>
-					<ul>
-						<li>Funktion määrittely ja kutsu</li>
-						<li>where / let in</li>
-						<li>if on expression</li>
-						<li>Pattern Matching, @</li>
-						<li>Guards</li>
-						<li>lambda</li>
-						<li>Currying</li>
-						<li>data, type, deriving</li>
-						<li>Tuple</li>
-						<li>Record</li>
-						<li>bottom / undefined / error</li>
-						<li></li>
-					</ul>
-			  </section>
+					<h2>Lyhyt oppimäärä Haskellin syntaksista</h2>
+					<p>Optimoitu tämän tehtävän tarpeisiin</p>
+				</section>
 
 				<section>
 					<h2>Funktio</h2>
@@ -166,20 +150,23 @@ add a b = a + b
 					<h2>where / let .. in </h2>
 					<pre><code class="haskell" data-trim contenteditable>
 foo :: Integer -> Integer -> Integer
-foo a b = a * x
+foo a b = y * x
   where x = b * b
+        y = a * a
 
 foo :: Integer -> Integer -> Integer
 foo a b = let
   x = b * b
-  in a * x
+  y = a * a
+  in y * x
 					</code></pre>
 				</section>
 
 				<section>
 					<h2>If</h2>
 					<pre><code class="haskell" data-trim contenteditable>
-let s = if True then 2 else 1
+smaller :: Integer -> Integer -> Integer
+smaller x y = if x < y then x else y
 					</code></pre>
 				</section>
 
@@ -220,8 +207,12 @@ takeTwos xs = filter (\x -> x == 2) xs
 					<p>
 						Haskellin funktiot ovat oletuksena "curried". Tämä tarkoittaa sitä,
 						että niitä voi kutsua pienemmällä parametrimäärällä kuin mitä funktion
-						rungon suorittamiseen tarvitaan. Esimerkiksi
+						rungon suorittamiseen tarvitaan.
 					</p>
+				</section>
+
+				<section>
+					<h2>Currying, Esimerkiksi</h2>
 					<pre><code class="haskell" data-trim contenteditable>
 add :: Integer -> Integer -> Integer
 -- on sama kuin:
@@ -233,13 +224,14 @@ add :: (Integer, Integer) -> Integer
 						Kahta ensimmäistä voi kutsua <code>add 1</code>. Tällöin paluuarvo
 						on funktio joka ottaa yhden parametrin ja lisää annettuun
 						parametriin arvon 1. Funktion kutsumista pienemmällä määrällä
-						parametreja kuin mitä se ottaa kutsutaan osittaiseki soveltamiseksi
+						parametreja kuin mitä se ottaa kutsutaan osittaiseksi soveltamiseksi
 						(partial application)
 					</p>
 				</section>
 
+
 				<section>
-					<h2>Currying in Action</h2>
+					<h2>Partial Application in Action</h2>
 					<pre><code class="haskell" data-trim contenteditable>
 let add x y = x + y -- Integer -> Integer -> Integer
 let add1 = add 1 -- Integer -> Integer
@@ -265,7 +257,7 @@ let t = (1,2)
 fst t -- 1
 snd t -- 2
 -- Pattern matching
-swap (i, j) = (j, i)
+let swap (i, j) = (j, i)
 					</code></pre>
 				</section>
 
@@ -276,11 +268,13 @@ swap (i, j) = (j, i)
 data Pos = Pos { x :: Int, y :: Int }
 -- Jäsen access
 let p = Pos 0 0
+let p0 = Pos { x = 0, y = 0 }
 let x = x p -- x :: Int == 0
 -- uuden luominen vanhasta
 let q = p { x = 1 } -- q == Pos {x = 1, y = 0}
 -- Pattern matching
-inc i (Pos x y) = Pos (x + i) (y + i)
+let inc i (Pos x y) = Pos (x + i) (y + i)
+let setY y Pos {x = lx} = Pos lx y
 					</code></pre>
 				</section>
 
@@ -295,12 +289,13 @@ inc i (Pos x y) = Pos (x + i) (y + i)
 						apuna. Tämä auttaa erityisesti type driven development-kehittämistä (se oikea TDD).
 					</p>
 					<pre><code class="haskell" data-trim contenteditable>
-div :: Integer -> Integer -> Integer
-div _ 0 = error "Division is not defined for 0"
-div a b = a `div` b
+gcd :: Integer -> Integer -> Integer
+gcd x y = undefined
+
+gcd3 :: Integer -> Integer -> Integer -> Integer
+gcd3 x y z = gcd z $ gcd x y
 					</code></pre>
 				</section>
-
 
 				<section>
 					<h2>Lyhyt oppimäärä Haskellin standardikirjastosta</h2>
@@ -310,8 +305,8 @@ div a b = a `div` b
 				<section>
 					<h2>Predule 1/2: List</h2>
 					<p>
-						Prelude on suhteellisen pieni haskell-moduuli, joka importoidaan
-						automaattisesti kaikkiin haskell-moduuleihin (ellei sitä explisiittisesti
+						Prelude on suhteellisen pieni Haskell-moduuli, joka importoidaan
+						automaattisesti kaikkiin Haskell-moduuleihin (ellei sitä eksplisiittisesti
 						estä). Nimitörmäysten vuoksi tehtävässä Preludesta joudutaan paikoin
 						piilottamaan osia.
 					</p>
@@ -373,10 +368,10 @@ fst $ fst $ snd (1, ((2, 3), 4)) -- 2
 				<section>
 					<h2>Data.Vector</h2>
 					<p>
-						Syntaksistaan huolimatta Haskell:n lista ([]) on hyvin eri asia kuin
+						Syntaksistaan huolimatta Haskellin lista ([]) on hyvin eri asia kuin
 						C:n taulukko tai C++:n std::vector. Tehtävän kannalta oleellisin
 						rajoitus on O(n) indeksointi. Tämä tehtävä hyötyy kuitenkin O(1)
-						indeksoinnista, joten käytämme taustarakenteena Vector:ia.
+						indeksoinnista, joten käytämme taustarakenteena Vectoria.
 					</p>
 					<pre><code class="haskell" data-trim contenteditable>
 fromList :: [a] -&gt; Vector a
@@ -389,7 +384,7 @@ elem :: a -&gt; Vector a -&gt; Bool
 				<section>
 					<h2>Vectoring</h2>
 					<pre><code class="haskell" data-trim contenteditable>
-fromList [1, 2, 3]           -- fromList [1, 2, 3] (kyllä, oikeasti...)
+fromList [1, 2, 3]           -- fromList [1, 2, 3]
 fromList [1, 2, 3] ! 2       -- 3
 length $ fromList [1]        -- 1
 elem 3 $ fromList [2, 3, 5]  -- True
@@ -402,7 +397,8 @@ elem 3 $ fromList [2, 3, 5]  -- True
 						Joukko on tietorakenne jonka natiivioperaatio on `member`.
 					</p>
 					<pre><code class="haskell" data-trim contenteditable>
-notMember / member :: a -&gt; Set a -&gt; Bool
+notMember :: a -&gt; Set a -&gt; Bool
+member :: a -&gt; Set a -&gt; Bool
 union :: Set a -&gt; Set a -&gt; Set a
 insert :: a -&gt; Set a -&gt; Set a
 fromList :: [a] -&gt; Set a
@@ -429,15 +425,14 @@ empty /= singleton 3           -- True
 					<p>
 						Jos etsit tiettyä Haskell-funktiota, Hoogle auttaa
 						<a href="https://www.haskell.org/hoogle/">www.haskell.org/hoogle</a>
-
 					</p>
+					<p>Funktioita voi etsiä nimellä tai tyypillä.</p>
 				</section>
 
 				<section>
 					<h2>Bloxorz</h2>
 					<p>
-						Pelaa peliä pari erää: <a href="http://www.miniclip.com/games/bloxorz/en/">www.miniclip.com/games/bloxorz/en/</a>
-						, vaatii flashin :(.
+						Pelaa peliä pari erää: <a href="http://www.miniclip.com/games/bloxorz/en/">www.miniclip.com/games/bloxorz/en/</a>, vaatii flashin :(.
 					</p>
 					<p>
 						Tehtävänä on kirjoittaa ohjelma joka ratkaisee yksinkertaisimpia
@@ -461,12 +456,21 @@ empty /= singleton 3           -- True
 				<section>
 					<h2>Bloxorz</h2>
 					<p>
-						dojo-hakemistossa on valmis pohja jaettuna useampaan tiedostoon
+						dojo-hakemistossa on valmis pohja jaettuna useampaan tiedostoon:
 					</p>
 					<dl>
 						<dt>Terrain.hs</dt><dd>Kentän määrittelyt ja jäsentäminen</dd>
 						<dt>Block.hs</dt><dd>Liikutettavan blokin käsittely</dd>
 						<dt>Bloxorz.hs</dt><dd>Ratkaisun etsiminen</dd>
+					</dl>
+				</section>
+
+				<section>
+					<h2>Bloxorz</h2>
+					<p>
+						Hakemistossa on myös yksikkötestejä ja apuja testaukseen GHCi:ssä:
+					</p>
+					<dl>
 						<dt>Levels.hs</dt><dd>Muutama kenttämäärittely</dd>
 						<dt>Tester.hs</dt><dd>Apumuuttujia ratkaisun testaamiseen GHCi:llä</dd>
 						<dt>UnitTests.hs</dt><dd>Yksikkötestejä joillekin funktioille</dd>
@@ -476,8 +480,8 @@ empty /= singleton 3           -- True
 				<section>
 					<h2>Bloxorz</h2>
 					<p>
-						Ratkaisun etenee tekemällä TODO-merkatut kohdat eri tiedostoista.
-						Välissä voit aina testata kirjoittamasi funktion toimintaa ghci:llä
+						Ratkaisu etenee tekemällä TODO-merkatut kohdat eri tiedostoista.
+						Välissä voit aina testata kirjoittamasi funktion toimintaa GHCi:llä
 						(Tester.hs tai UnitTests.hs).
 					</p>
 					<ul>
