@@ -67,7 +67,7 @@ newNeighbours neighbours explored =
 -- of different paths - the implementation should naturally
 -- construct the correctly sorted list.
 from :: Level -> [State] -> Explored -> [State]
-from level []                         _        = []
+from _     []                         _        = []
 from level (state @ (b, ms) : states) explored =
   state : from level newStates newExplored
   where
@@ -87,7 +87,8 @@ pathsFromStart level @ Level { start = startPos } =
 -- Returns a list of all possible pairs of the goal block along
 -- with the history how it was reached.
 pathsToGoal :: Level -> [State]
-pathsToGoal level = filter (\(b, _) -> done level b) (pathsFromStart level)
+pathsToGoal level = filter (done level . fst) (pathsFromStart level)
+--pathsToGoal level = filter (\(b, _) -> done level b) (pathsFromStart level)
 
 -- TODO 14:
 -- The (or one of the) shortest sequence(s) of moves to reach the
@@ -97,6 +98,12 @@ pathsToGoal level = filter (\(b, _) -> done level b) (pathsFromStart level)
 -- the first move that the player should perform from the starting
 -- position.
 solution :: Level -> [Move]
-solution level = if null result then [] else reverse $ head result
+solution level =
+  case result of
+    []     -> []
+    p : _ -> reverse p
   where
     result = map snd (pathsToGoal level)
+-- solution level = if null result then [] else reverse $ head result
+--  where
+--    result = map snd (pathsToGoal level)

@@ -38,7 +38,6 @@ blockDx b d1 d2 = makeBlock (dx (p1 b) d1) (dx (p2 b) d2)
 -- TODO 3:
 -- Returns `true` if the block is standing.
 standing :: Block -> Bool
--- standing B {p1 = pa, p2 = pb} = pa == pb
 standing (B pa pb) = pa == pb
 
 horizontal :: Block -> Bool
@@ -95,5 +94,5 @@ neighbours block = [(left block, Left), (right block, Right),
 -- Returns the list of positions reachable from the current block
 -- which are inside the terrain.
 legalNeighbours :: Block -> Terrain -> [(Block, Move)]
--- legalNeighbours block terrain = filter ((isLegal terrain).fst) (neighbours block)
-legalNeighbours block terrain = filter (\(b, _) -> isLegal terrain b) (neighbours block)
+legalNeighbours block terrain = filter ((isLegal terrain) . fst) (neighbours block)
+--legalNeighbours block terrain = filter (\(b, _) -> isLegal terrain b) (neighbours block)

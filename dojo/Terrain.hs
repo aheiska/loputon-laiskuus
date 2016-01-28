@@ -54,7 +54,8 @@ data Level = Level { start :: Pos
 -- - `T` denotes the final position of the block (which is also considered
 --    inside the terrain)
 buildLevel :: [String] -> Level
-buildLevel rows = toLevel $ toTerrain rows
+--buildLevel rows = toLevel $ toTerrain rows
+buildLevel = toLevel . toTerrain
 
 toTerrain :: [String] -> LevelVector
 toTerrain rows = fromList $ map fromList rows
@@ -77,7 +78,8 @@ findChar :: Char -> LevelVector -> Pos
 findChar c levelVector =
   Pos x y
   where
-    x = findIndex' (\vc -> c `elem` vc) levelVector
+    -- x = findIndex' (\vc -> c `elem` vc) levelVector
+    x = findIndex' (elem c) levelVector
     y = elemIndex' c (levelVector ! x)
 
 findIndex' :: (Vector Char -> Bool) -> LevelVector -> Int
@@ -103,11 +105,11 @@ elemIndex' e vector = fromJust $ elemIndex e vector
 -- a valid position (not a '-' character) inside the terrain described
 -- by `LevelVector`.
 terrain :: LevelVector -> Terrain
-terrain levelVector Pos { x = lx, y = ly } =
-  inRange && (levelVector ! lx ! ly) /= '-'
+terrain levelVector (Pos x y) =
+  inRange && (levelVector ! x ! y) /= '-'
   where
     inRange =
-      lx >= 0 &&
-      ly >= 0 &&
-      lx < length levelVector &&
-      ly < length (levelVector ! lx)
+      x >= 0 &&
+      y >= 0 &&
+      x < length levelVector &&
+      y < length (levelVector ! x)
